@@ -9,9 +9,8 @@ import java.util.*
  */
 interface RetrofitService {
 
-
-    @GET("/")
-    fun get(): Call<List<Schema.History>>
+//    @GET("/")
+//    fun get(): Call<List<Schema.History>>
 
     @POST("/")
     @FormUrlEncoded

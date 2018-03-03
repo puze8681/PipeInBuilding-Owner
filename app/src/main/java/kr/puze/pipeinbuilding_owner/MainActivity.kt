@@ -21,7 +21,6 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,8 +36,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
         //전체화면 만들기
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
@@ -80,14 +77,16 @@ class MainActivity : AppCompatActivity() {
         bluetooth()
 
         btn_switch.setOnClickListener {
-            status != status
+            status = (!status)
             if(status){
                 txt_switch.text = "On"
                 bt.send("o", true)
+                retrofitPost()
             }
             else{
                 txt_switch.text = "Off"
                 bt.send("x",true)
+                retrofitPut()
             }
         }
     }
@@ -162,13 +161,11 @@ class MainActivity : AppCompatActivity() {
             override fun onDeviceConnected(name: String, address: String) {
                 Toast.makeText(application, "연결되었습니다", Toast.LENGTH_SHORT).show()
                 txt_bluetooth.text = "On"
-                if(status)retrofitPost()
             }
 
             override fun onDeviceDisconnected() {
                 Toast.makeText(application, "연결이끊겼습니다", Toast.LENGTH_SHORT).show()
                 txt_bluetooth.text = "Off"
-                if(status)retrofitPut()
             }
 
             override fun onDeviceConnectionFailed() {
@@ -196,10 +193,12 @@ class MainActivity : AppCompatActivity() {
         bt.setAutoConnectionListener(object : BluetoothSPP.AutoConnectionListener {
             override fun onNewConnection(name: String, address: String) {
                 bt.connect("00:21:13:00:E3:F8")
+                Log.d("autolistener", "new connection")
             }
 
             override fun onAutoConnectionStarted() {
                 bt.connect("00:21:13:00:E3:F8")
+                Log.d("autolistener", "start")
             }
         })
 
@@ -216,7 +215,7 @@ class MainActivity : AppCompatActivity() {
 
     fun retrofitSetting() {
         var retrofit: Retrofit = Retrofit.Builder()
-                .baseUrl("localhost:3000")
+                .baseUrl("http://localhost:3000")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
         retrofitService = retrofit.create(RetrofitService::class.java)
